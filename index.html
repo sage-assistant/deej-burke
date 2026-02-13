@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLASSIFIED — Subject: BURKE, D.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Playfair+Display:wght@400;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface-2: #1a1a1a;
+      --border: rgba(212,168,83,0.15);
+      --text: #e8e0d0;
+      --text-dim: #7a7265;
+      --amber: #d4a853;
+      --amber-soft: rgba(212,168,83,0.1);
+      --amber-glow: rgba(212,168,83,0.3);
+      --red: #c0392b;
+      --red-soft: rgba(192,57,43,0.15);
+      --red-glow: rgba(192,57,43,0.3);
+      --green: #27ae60;
+      --green-soft: rgba(39,174,96,0.15);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'IBM Plex Mono',monospace;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.6;
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+    }
+    body::after {
+      content:'';position:fixed;inset:0;
+      background:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity:0.03;pointer-events:none;z-index:9997;
+    }
+    .typewriter { font-family:'Special Elite',cursive; }
+    .display { font-family:'Playfair Display',serif; font-weight:700; }
+    .mono { font-family:'IBM Plex Mono',monospace; }
+
+    /* SPLASH */
+    .splash {
+      position:fixed;inset:0;background:var(--bg);z-index:10000;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:2rem;
+      transition:opacity 0.8s,visibility 0.8s;
+    }
+    .splash.hidden { opacity:0;visibility:hidden;pointer-events:none; }
+    .splash-stamp {
+      font-family:'Special Elite',cursive;font-size:clamp(3rem,10vw,6rem);
+      color:var(--red);border:6px solid var(--red);padding:0.5rem 2rem;
+      transform:rotate(-5deg);margin-bottom:2rem;
+      text-shadow:0 0 30px var(--red-glow);
+      animation:stamp-pulse 2s ease-in-out infinite;
+      cursor:pointer;user-select:none;
+    }
+    @keyframes stamp-pulse { 0%,100%{transform:rotate(-5deg) scale(1);} 50%{transform:rotate(-5deg) scale(1.02);} }
+    .splash-file {
+      font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--amber);
+      letter-spacing:0.2em;margin-bottom:2rem;
+    }
+    .splash-text {
+      font-family:'Special Elite',cursive;font-size:clamp(0.9rem,2.5vw,1.2rem);
+      color:var(--text-dim);max-width:550px;margin-bottom:3rem;line-height:1.8;
+    }
+    .splash-btn {
+      padding:1.2rem 3rem;background:transparent;border:2px solid var(--amber);
+      color:var(--amber);font-family:'Special Elite',cursive;font-size:1.1rem;
+      cursor:pointer;letter-spacing:0.1em;transition:all 0.3s;position:relative;
+    }
+    .splash-btn:hover { background:var(--amber);color:var(--bg);transform:translateY(-2px);box-shadow:0 10px 40px var(--amber-glow); }
+    .splash-warning-bottom {
+      position:absolute;bottom:2rem;font-size:0.6rem;color:var(--text-dim);
+      opacity:0.4;font-family:'IBM Plex Mono',monospace;
+    }
+
+    /* SURVEILLANCE FEED */
+    .surveillance {
+      position:fixed;top:0;left:0;right:0;z-index:9998;
+      padding:0.4rem 2rem;background:rgba(10,10,10,0.95);
+      border-bottom:1px solid var(--border);
+      display:flex;justify-content:space-between;align-items:center;
+      font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;
+      opacity:0;transition:opacity 0.5s;color:var(--text-dim);
+    }
+    .surveillance.visible { opacity:1; }
+    .surv-live { color:var(--red);display:flex;align-items:center;gap:0.5rem; }
+    .surv-live::before {
+      content:'';width:6px;height:6px;background:var(--red);border-radius:50%;
+      animation:blink 1s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+    .surv-timer { color:var(--amber);font-weight:600; }
+
+    /* SECURITY BREACH OVERLAY */
+    .breach-overlay {
+      position:fixed;inset:0;background:rgba(192,57,43,0.95);z-index:99999;
+      display:none;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:2rem;
+    }
+    .breach-overlay.active { display:flex;animation:breach-flash 0.3s ease-in-out 3; }
+    @keyframes breach-flash { 0%,100%{opacity:1;} 50%{opacity:0.7;} }
+    .breach-text {
+      font-family:'Special Elite',cursive;font-size:clamp(3rem,8vw,6rem);
+      color:white;margin-bottom:1rem;
+    }
+    .breach-sub { font-size:1rem;color:rgba(255,255,255,0.8);margin-bottom:2rem; }
+    .breach-dismiss {
+      padding:1rem 2rem;background:white;color:var(--red);border:none;
+      font-family:'Special Elite',cursive;font-size:1rem;cursor:pointer;
+    }
+
+    /* MAIN CONTENT */
+    .main-content { display:none; }
+    .main-content.active { display:block; }
+    .container { max-width:1000px;margin:0 auto;padding:0 clamp(1.5rem,5vw,4rem); }
+    section { padding:clamp(4rem,10vw,7rem) 0; }
+    .section-header { text-align:center;margin-bottom:3rem; }
+    .section-label {
+      font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;
+      color:var(--red);margin-bottom:0.75rem;display:flex;align-items:center;
+      justify-content:center;gap:0.75rem;
+    }
+    .section-label::before,.section-label::after { content:'';width:40px;height:1px;background:var(--red); }
+    .section-title { font-size:clamp(1.5rem,4vw,2.5rem);color:var(--amber);margin-bottom:1rem; }
+    .section-desc { font-size:0.85rem;color:var(--text-dim);max-width:600px;margin:0 auto;line-height:1.8; }
+
+    .divider {
+      border:none;height:1px;
+      background:linear-gradient(90deg,transparent,var(--border),transparent);
+      margin:0;
+    }
+
+    /* REVEAL ANIMATIONS */
+    .reveal { opacity:0;transform:translateY(30px);transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1),transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity:1;transform:translateY(0); }
+
+    /* REDACTED TEXT */
+    .redacted {
+      background:var(--text);color:var(--text);cursor:pointer;
+      padding:0 0.2em;transition:all 0.3s;position:relative;user-select:none;
+    }
+    .redacted:hover,.redacted.revealed { background:transparent;color:var(--amber); }
+    .redacted::after { content:'[CLICK TO DECLASSIFY]';position:absolute;top:-1.5em;left:50%;transform:translateX(-50%);font-size:0.5rem;color:var(--red);opacity:0;transition:opacity 0.3s;white-space:nowrap; }
+    .redacted:hover::after { opacity:1; }
+
+    /* ============ SECTION 1: SUBJECT PROFILE ============ */
+    .profile-section { background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border); }
+    .dossier-card {
+      display:grid;grid-template-columns:200px 1fr;gap:2.5rem;
+      padding:2.5rem;background:var(--bg);border:1px solid var(--border);border-radius:4px;
+      position:relative;overflow:hidden;
+    }
+    .dossier-card::before {
+      content:'CLASSIFIED';position:absolute;top:20px;right:-35px;
+      background:var(--red);color:white;padding:0.3rem 3rem;
+      font-family:'Special Elite',cursive;font-size:0.75rem;
+      transform:rotate(45deg);letter-spacing:0.1em;
+    }
+    .dossier-photo {
+      width:200px;height:250px;background:var(--surface-2);border:1px solid var(--border);
+      display:flex;align-items:center;justify-content:center;position:relative;
+    }
+    .dossier-photo svg { width:80px;height:80px;fill:var(--text-dim);opacity:0.3; }
+    .dossier-photo::after {
+      content:'PHOTO REDACTED';position:absolute;bottom:10px;left:0;right:0;
+      text-align:center;font-size:0.6rem;color:var(--red);letter-spacing:0.15em;
+    }
+    .dossier-fields { display:grid;gap:0.75rem; }
+    .dossier-row { display:flex;gap:1rem;font-size:0.8rem; }
+    .dossier-key { color:var(--text-dim);min-width:140px;text-transform:uppercase;letter-spacing:0.1em;font-size:0.7rem; }
+    .dossier-val { color:var(--text); }
+    .dossier-val.extreme { color:var(--red);font-weight:700;animation:threat-pulse 1.5s ease-in-out infinite; }
+    @keyframes threat-pulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+    .threat-badge {
+      display:inline-block;padding:0.2rem 0.75rem;background:var(--red);color:white;
+      font-size:0.65rem;letter-spacing:0.15em;font-weight:700;
+    }
+
+    /* ============ SECTION 2: TIMELINE ============ */
+    .timeline { position:relative;padding-left:3rem; }
+    .timeline::before {
+      content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;
+      background:linear-gradient(to bottom,var(--amber),var(--red));
+    }
+    .timeline-item { position:relative;margin-bottom:2.5rem;padding-left:2rem; }
+    .timeline-item::before {
+      content:'';position:absolute;left:-3rem;top:0.3rem;width:12px;height:12px;
+      background:var(--amber);border:3px solid var(--bg);border-radius:50%;z-index:1;
+    }
+    .timeline-date {
+      font-size:0.65rem;color:var(--red);letter-spacing:0.2em;
+      text-transform:uppercase;margin-bottom:0.3rem;
+    }
+    .timeline-title { font-family:'Special Elite',cursive;font-size:1.1rem;color:var(--amber);margin-bottom:0.3rem; }
+    .timeline-desc { font-size:0.8rem;color:var(--text-dim);line-height:1.7; }
+    .timeline-status {
+      display:inline-block;margin-top:0.5rem;padding:0.2rem 0.6rem;
+      font-size:0.6rem;letter-spacing:0.1em;border-radius:2px;
+    }
+    .status-critical { background:var(--red-soft);color:var(--red); }
+    .status-warning { background:var(--amber-soft);color:var(--amber); }
+    .status-active { background:var(--green-soft);color:var(--green); }
+
+    /* ============ SECTION 3: THREAT GAUGES ============ */
+    .gauges-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem; }
+    .gauge-card {
+      padding:2rem;background:var(--surface);border:1px solid var(--border);
+      border-radius:4px;text-align:center;
+    }
+    .gauge-label { font-size:0.65rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:1rem; }
+    .gauge-bar-outer {
+      width:100%;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin-bottom:0.75rem;
+    }
+    .gauge-bar-inner {
+      height:100%;border-radius:4px;width:0;transition:width 2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .gauge-bar-inner.critical { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .gauge-bar-inner.severe { background:linear-gradient(90deg,var(--amber),#e67e22); }
+    .gauge-bar-inner.extreme { background:linear-gradient(90deg,var(--red),#8e44ad); }
+    .gauge-bar-inner.minimal { background:linear-gradient(90deg,var(--green),var(--amber)); }
+    .gauge-value { font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700; }
+    .gauge-value.red { color:var(--red); }
+    .gauge-value.amber { color:var(--amber); }
+    .gauge-value.green { color:var(--green); }
+    .gauge-status { font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;margin-top:0.25rem; }
+
+    /* ============ SECTION 4: INTERCEPTED COMMS ============ */
+    .comms-section { background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border); }
+    .transcript {
+      margin-bottom:2rem;padding:2rem;background:var(--bg);
+      border-left:3px solid var(--amber);border-radius:0 4px 4px 0;position:relative;
+    }
+    .transcript::before {
+      content:'▶ WIRETAP TRANSCRIPT';position:absolute;top:-0.6rem;left:1rem;
+      background:var(--bg);padding:0 0.5rem;font-size:0.55rem;color:var(--red);
+      letter-spacing:0.2em;
+    }
+    .transcript-meta { font-size:0.6rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.1em; }
+    .transcript-body {
+      font-family:'Special Elite',cursive;font-size:1.05rem;color:var(--amber);
+      line-height:1.8;
+    }
+    .transcript-note { font-size:0.7rem;color:var(--text-dim);margin-top:1rem;font-style:italic; }
+
+    /* ============ SECTION 5: NETWORK ============ */
+    .network-container {
+      padding:2.5rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;
+      position:relative;overflow:hidden;
+    }
+    .network-canvas { width:100%;height:400px;display:block; }
+    .network-legend { margin-top:1.5rem;font-size:0.7rem;color:var(--text-dim);text-align:center; }
+
+    /* ============ SECTION 6: CONTAINMENT LOG ============ */
+    .containment-log { display:grid;gap:1rem; }
+    .log-entry {
+      display:grid;grid-template-columns:120px 1fr 100px;gap:1.5rem;
+      padding:1.5rem;background:var(--surface);border:1px solid var(--border);
+      border-radius:4px;align-items:center;font-size:0.8rem;
+    }
+    .log-date { color:var(--text-dim);font-size:0.7rem; }
+    .log-action { color:var(--text); }
+    .log-result {
+      text-align:center;padding:0.3rem 0.6rem;font-size:0.6rem;
+      letter-spacing:0.1em;font-weight:700;border-radius:2px;
+    }
+    .log-failed { background:var(--red-soft);color:var(--red); }
+    .log-backfire { background:rgba(142,68,173,0.15);color:#9b59b6; }
+
+    /* ============ SECTION 7: RISK CALCULATOR ============ */
+    .calc-box {
+      max-width:600px;margin:0 auto;padding:2.5rem;
+      background:var(--surface);border:1px solid var(--border);border-radius:4px;
+    }
+    .calc-input-group { margin-bottom:1.5rem; }
+    .calc-input-label { font-size:0.6rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5rem; }
+    .calc-input {
+      width:100%;padding:1rem;background:var(--bg);border:1px solid var(--border);
+      color:var(--amber);font-family:'Special Elite',cursive;font-size:1rem;
+      border-radius:2px;
+    }
+    .calc-input:focus { outline:none;border-color:var(--amber); }
+    .calc-input::placeholder { color:var(--text-dim); }
+    .calc-btn {
+      width:100%;padding:1rem;background:var(--red);border:2px solid var(--red);
+      color:white;font-family:'Special Elite',cursive;font-size:1rem;
+      cursor:pointer;letter-spacing:0.1em;transition:all 0.3s;
+    }
+    .calc-btn:hover { background:transparent;color:var(--red); }
+    .calc-result {
+      display:none;margin-top:2rem;padding:2rem;background:var(--bg);
+      border:2px solid var(--red);border-radius:4px;
+    }
+    .calc-result.visible { display:block;animation:fadeUp 0.5s ease-out; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+    .calc-result-header {
+      font-family:'Special Elite',cursive;font-size:1.5rem;color:var(--red);
+      text-align:center;margin-bottom:1rem;
+    }
+    .calc-result-body { font-size:0.8rem;color:var(--text-dim);line-height:1.8; }
+    .calc-result-body strong { color:var(--amber); }
+    .calc-threat-level {
+      text-align:center;margin-top:1.5rem;padding:1rem;
+      background:var(--red-soft);border-radius:4px;
+    }
+    .calc-threat-text { font-family:'Playfair Display',serif;font-size:2rem;color:var(--red);font-weight:700; }
+    .calc-threat-sub { font-size:0.65rem;color:var(--text-dim);letter-spacing:0.15em;margin-top:0.25rem; }
+
+    /* ============ SECTION 8: FINAL ASSESSMENT ============ */
+    .final-section {
+      text-align:center;padding:6rem 2rem;
+      background:radial-gradient(ellipse 80% 50% at 50% 100%,var(--amber-soft),transparent 60%),var(--bg);
+    }
+    .final-verdict {
+      font-family:'Special Elite',cursive;font-size:clamp(1.5rem,4vw,2.5rem);
+      color:var(--amber);margin-bottom:2rem;line-height:1.6;max-width:700px;margin-left:auto;margin-right:auto;
+    }
+    .final-stamp {
+      display:inline-block;padding:0.5rem 2rem;border:4px solid var(--red);
+      font-family:'Special Elite',cursive;font-size:1.5rem;color:var(--red);
+      transform:rotate(-3deg);margin-bottom:3rem;
+    }
+    .final-cta {
+      display:inline-flex;align-items:center;gap:0.75rem;
+      padding:1.2rem 3rem;background:var(--amber);color:var(--bg);
+      text-decoration:none;font-family:'Special Elite',cursive;font-size:1.1rem;
+      transition:all 0.3s;border:2px solid var(--amber);
+    }
+    .final-cta:hover { background:transparent;color:var(--amber);transform:translateY(-2px);box-shadow:0 10px 40px var(--amber-glow); }
+    .final-links { margin-top:1.5rem;display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap; }
+    .final-link {
+      color:var(--text-dim);text-decoration:none;font-size:0.8rem;
+      border-bottom:1px solid var(--border);padding-bottom:0.2rem;transition:color 0.3s;
+    }
+    .final-link:hover { color:var(--amber); }
+
+    /* FOOTER */
+    footer {
+      padding:3rem 2rem;text-align:center;border-top:1px solid var(--border);
+    }
+    .footer-agency { font-family:'Special Elite',cursive;font-size:0.9rem;color:var(--amber);margin-bottom:0.5rem; }
+    .footer-tagline { font-size:0.6rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1.5rem; }
+    .footer-disclaimer { font-size:0.6rem;color:var(--text-dim);opacity:0.4;max-width:500px;margin:0 auto;line-height:1.7; }
+
+    /* RESPONSIVE */
+    @media (max-width:768px) {
+      .dossier-card { grid-template-columns:1fr;justify-items:center; }
+      .dossier-photo { width:150px;height:190px; }
+      .gauges-grid { grid-template-columns:1fr; }
+      .log-entry { grid-template-columns:1fr;gap:0.5rem; }
+      .log-result { text-align:left;display:inline-block; }
+      .surveillance { font-size:0.55rem;padding:0.3rem 1rem; }
+      .network-canvas { height:300px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SECURITY BREACH EASTER EGG -->
+  <div class="breach-overlay" id="breachOverlay">
+    <div class="breach-text">⚠ SECURITY BREACH ⚠</div>
+    <div class="breach-sub">UNAUTHORIZED ACCESS PATTERN DETECTED<br>Tracing IP address... Location: YOUR HOUSE<br>Agent Burke has been notified of your snooping.</div>
+    <button class="breach-dismiss" onclick="document.getElementById('breachOverlay').classList.remove('active')">[ CLEAR ALERT ]</button>
+  </div>
+
+  <!-- SPLASH SCREEN -->
+  <div class="splash" id="splash">
+    <div class="splash-stamp" id="classifiedStamp">CLASSIFIED</div>
+    <div class="splash-file">FILE NO. DBK-2024-0847 &nbsp;|&nbsp; CLEARANCE: LEVEL 9 REQUIRED</div>
+    <div class="splash-text">
+      This document contains sensitive intelligence regarding Subject <strong style="color:var(--amber)">BURKE, D.</strong> — codename "THE CLOSER."<br><br>
+      Unauthorized access will be reported to the Bureau of Suspiciously Effective Salespeople.
+    </div>
+    <button class="splash-btn" id="enterBtn">I HAVE CLEARANCE</button>
+    <div class="splash-warning-bottom">BUREAU OF COMMERCIAL INTELLIGENCE • SOUTH AFRICA FIELD OFFICE • EST. 2024</div>
+  </div>
+
+  <!-- SURVEILLANCE BAR -->
+  <div class="surveillance" id="survBar">
+    <div class="surv-live">SURVEILLANCE FEED ACTIVE</div>
+    <div>FILE: DBK-2024-0847 | CLASSIFICATION: BEYOND TOP SECRET</div>
+    <div>TIME ON FILE: <span class="surv-timer" id="survTimer">00:00:00</span></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="mainContent">
+
+    <!-- HERO -->
+    <section style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 3rem;">
+      <div>
+        <div class="reveal" style="font-size:0.65rem;color:var(--red);letter-spacing:0.3em;margin-bottom:1rem;">BUREAU OF COMMERCIAL INTELLIGENCE — FIELD REPORT</div>
+        <h1 class="display reveal" style="font-size:clamp(2rem,6vw,4rem);color:var(--amber);margin-bottom:1rem;">SUBJECT: BURKE, DYLAN "DEEJ"</h1>
+        <p class="reveal" style="font-size:0.85rem;color:var(--text-dim);max-width:600px;margin:0 auto 2rem;line-height:1.8;">
+          The following dossier documents a person of extreme interest whose <span class="redacted">supernatural</span> sales abilities,
+          relentless hustle, and suspiciously growing influence have triggered a full-scale investigation.
+        </p>
+        <div class="reveal" style="display:inline-block;padding:0.3rem 1.5rem;border:2px solid var(--red);font-family:'Special Elite',cursive;color:var(--red);font-size:0.8rem;transform:rotate(-2deg);">
+          THREAT LEVEL: EXTREME
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 1: SUBJECT PROFILE -->
+    <section class="profile-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Section 1</div>
+          <h2 class="display section-title">Subject Profile</h2>
+        </div>
+        <div class="dossier-card reveal">
+          <div class="dossier-photo">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div class="dossier-fields">
+            <div class="dossier-row"><span class="dossier-key">Full Name:</span><span class="dossier-val">Dylan "Deej" Burke</span></div>
+            <div class="dossier-row"><span class="dossier-key">Known Aliases:</span><span class="dossier-val">"Deej", "The Closer", "The One-Man Agency"</span></div>
+            <div class="dossier-row"><span class="dossier-key">Location:</span><span class="dossier-val">South Africa (last known position)</span></div>
+            <div class="dossier-row"><span class="dossier-key">Occupation:</span><span class="dossier-val">Growth Manager / Media Buyer / Podcast Host / App Builder / <span class="redacted">Future Mogul</span></span></div>
+            <div class="dossier-row"><span class="dossier-key">Affiliation:</span><span class="dossier-val">LedgerWorks (current), Lean Discovery Group (podcast front)</span></div>
+            <div class="dossier-row"><span class="dossier-key">Experience:</span><span class="dossier-val">8+ years B2B sales (unverified ceiling)</span></div>
+            <div class="dossier-row"><span class="dossier-key">Threat Level:</span><span class="dossier-val extreme"><span class="threat-badge">EXTREME</span> — DO NOT ENGAGE IN NEGOTIATION</span></div>
+            <div class="dossier-row"><span class="dossier-key">Safety Net:</span><span class="dossier-val" style="color:var(--red);">NONE. Subject burned all bridges deliberately.</span></div>
+            <div class="dossier-row"><span class="dossier-key">Instagram:</span><span class="dossier-val">@deej.burke (under surveillance)</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 2: INCIDENT TIMELINE -->
+    <section>
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Section 2</div>
+          <h2 class="display section-title">Incident Timeline</h2>
+          <p class="section-desc">Chronological log of escalating incidents that triggered this investigation.</p>
+        </div>
+        <div class="timeline reveal">
+          <div class="timeline-item">
+            <div class="timeline-date">INCIDENT #001 — EARLY CAREER</div>
+            <div class="timeline-title">Subject enters B2B sales field</div>
+            <div class="timeline-desc">Initial surveillance deemed unnecessary. "Just another sales guy." <span class="redacted">We were wrong.</span></div>
+            <span class="timeline-status status-warning">INITIAL ASSESSMENT: LOW RISK</span>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">INCIDENT #024 — YEAR 3</div>
+            <div class="timeline-title">Close rate exceeds industry average by 340%</div>
+            <div class="timeline-desc">Internal alarm triggered. Subject observed closing deals that seasoned agents couldn't. Suspected use of <span class="redacted">illegal charisma</span>. Investigation opened.</div>
+            <span class="timeline-status status-critical">RISK LEVEL ELEVATED</span>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">INCIDENT #089 — YEAR 5</div>
+            <div class="timeline-title">Subject launches podcast — suspected recruitment tool</div>
+            <div class="timeline-desc">"Growing Lean" podcast established under Lean Discovery Group. Subject interviews founders weekly. Purpose unclear — possibly building an army. <span class="redacted">Definitely building an army.</span></div>
+            <span class="timeline-status status-critical">PSYOPS DIVISION NOTIFIED</span>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">INCIDENT #142 — YEAR 6</div>
+            <div class="timeline-title">Subject begins building apps for B2B scaling</div>
+            <div class="timeline-desc">Workflow automation. No-code tools. AI integrations. Subject is not just selling — he's building infrastructure. This is no longer a sales operation. This is an <span class="redacted">empire</span>.</div>
+            <span class="timeline-status status-critical">MULTI-DIVISION RESPONSE ACTIVATED</span>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">INCIDENT #198 — ~5 MONTHS AGO</div>
+            <div class="timeline-title">⚠ SUBJECT WENT ROGUE — ALL HANDLERS LOST CONTACT</div>
+            <div class="timeline-desc">Subject abandoned secure employment. Launched independent media buying practice for DTC and B2B brands. Quote intercepted: "Bet on myself, no safety net, no fallback plan." All containment protocols failed. <span class="redacted">Subject is free.</span></div>
+            <span class="timeline-status status-critical">CODE RED — UNCONTAINABLE</span>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">INCIDENT #247 — PRESENT DAY</div>
+            <div class="timeline-title">Subject barely breaking even — morale inexplicably HIGH</div>
+            <div class="timeline-desc">Financial pressure has not slowed subject. If anything, he appears to be <em>enjoying</em> the struggle. Psych evaluation inconclusive. Subject may be immune to conventional deterrents.</div>
+            <span class="timeline-status status-active">ACTIVE — MONITORING ONGOING</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 3: THREAT ASSESSMENT -->
+    <section>
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Section 3</div>
+          <h2 class="display section-title">Threat Assessment Dashboard</h2>
+          <p class="section-desc">Real-time capability analysis of Subject Burke. All readings confirmed by multiple field agents.</p>
+        </div>
+        <div class="gauges-grid reveal" id="gaugesGrid">
+          <div class="gauge-card">
+            <div class="gauge-label">Sales Ability</div>
+            <div class="gauge-bar-outer"><div class="gauge-bar-inner critical" data-width="98"></div></div>
+            <div class="gauge-value red">98/100</div>
+            <div class="gauge-status" style="color:var(--red);">▲ CRITICAL — APPROACH WITH SIGNED CONTRACT READY</div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-label">Podcast Charisma</div>
+            <div class="gauge-bar-outer"><div class="gauge-bar-inner severe" data-width="91"></div></div>
+            <div class="gauge-value amber">91/100</div>
+            <div class="gauge-status" style="color:var(--amber);">▲ SEVERE — FOUNDERS COMPELLED TO SHARE SECRETS</div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-label">Hustle Level</div>
+            <div class="gauge-bar-outer"><div class="gauge-bar-inner extreme" data-width="100"></div></div>
+            <div class="gauge-value red">∞/100</div>
+            <div class="gauge-status" style="color:var(--red);">◉ OFF THE CHARTS — GAUGE BROKE TWICE</div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-label">Work-Life Balance</div>
+            <div class="gauge-bar-outer"><div class="gauge-bar-inner minimal" data-width="15"></div></div>
+            <div class="gauge-value green">15/100</div>
+            <div class="gauge-status" style="color:var(--green);">▼ MINIMAL — SUBJECT INSISTS THIS IS "BY CHOICE"</div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-label">Brutally Honest Meeting Rating</div>
+            <div class="gauge-bar-outer"><div class="gauge-bar-inner critical" data-width="100"></div></div>
+            <div class="gauge-value red">100/100</div>
+            <div class="gauge-status" style="color:var(--red);">◉ MAXIMUM — CLIENTS REPORT "REFRESHING TERROR"</div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-label">Referral Generation</div>
+            <div class="gauge-bar-outer"><div class="gauge-bar-inner severe" data-width="95"></div></div>
+            <div class="gauge-value amber">95/100</div>
+            <div class="gauge-status" style="color:var(--amber);">▲ VIRAL — CLIENTS RECRUIT OTHER CLIENTS FOR HIM</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 4: INTERCEPTED COMMUNICATIONS -->
+    <section class="comms-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Section 4</div>
+          <h2 class="display section-title">Intercepted Communications</h2>
+          <p class="section-desc">The following transmissions were captured via authorized wiretap. Handle with caution — contents are motivationally hazardous.</p>
+        </div>
+        <div class="reveal">
+          <div class="transcript">
+            <div class="transcript-meta">INTERCEPT #4471 | 14:23 SAST | SOURCE: CLIENT CALL (UNSECURED LINE)</div>
+            <div class="transcript-body">"I don't take business. I earn it."</div>
+            <div class="transcript-note">Analyst note: Statement delivered with zero hesitation. Polygraph confirms subject believes this completely. Terrifying.</div>
+          </div>
+          <div class="transcript">
+            <div class="transcript-meta">INTERCEPT #4489 | 09:11 SAST | SOURCE: PODCAST RECORDING (GROWING LEAN EP. 47)</div>
+            <div class="transcript-body">"Stay brutally honest in every meeting. If your product isn't the right fit, say so. They'll come back when it is."</div>
+            <div class="transcript-note">Analyst note: Subject is weaponizing honesty. Unprecedented. Recommend developing counter-honesty measures.</div>
+          </div>
+          <div class="transcript">
+            <div class="transcript-meta">INTERCEPT #4502 | 22:47 SAST | SOURCE: INSTAGRAM DM (TO UNKNOWN FOUNDER)</div>
+            <div class="transcript-body">"Start lean. Low rates. Prove yourself first. Then renegotiate. The work speaks louder than the invoice."</div>
+            <div class="transcript-note">Analyst note: This strategy is <span class="redacted">devastatingly effective</span>. By the time clients realize what hit them, they're already referring friends.</div>
+          </div>
+          <div class="transcript">
+            <div class="transcript-meta">INTERCEPT #4518 | 03:22 SAST | SOURCE: PRIVATE JOURNAL (RECOVERED FROM CLOUD BACKUP)</div>
+            <div class="transcript-body">"Bet on myself. No safety net. No fallback plan. If this doesn't work, I'll make it work. And if that doesn't work, I'll build something new that does."</div>
+            <div class="transcript-note">Analyst note: Subject was awake at 3 AM writing this. Sleep deprivation has not degraded resolve. If anything, <span class="redacted">it's made him stronger</span>.</div>
+          </div>
+          <div class="transcript">
+            <div class="transcript-meta">INTERCEPT #4531 | 16:55 SAST | SOURCE: VIDEO CALL WITH PROSPECTIVE CLIENT</div>
+            <div class="transcript-body">"Look, I'm not going to oversell this. Here's what I can actually do, here's what it'll cost, and here's what you should realistically expect. If that works for you, let's go."</div>
+            <div class="transcript-note">Analyst note: Client signed immediately. Subject didn't even use a closing technique. He just... told the truth. We don't have a protocol for this.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 5: KNOWN ASSOCIATES -->
+    <section>
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Section 5</div>
+          <h2 class="display section-title">Known Associates Analysis</h2>
+          <p class="section-desc">Subject maintains an extensive and growing network of founders, clients, and industry contacts. Purpose: unclear. Possibly building an army.</p>
+        </div>
+        <div class="network-container reveal">
+          <canvas class="network-canvas" id="networkCanvas"></canvas>
+          <div class="network-legend">
+            <span style="color:var(--amber);">● SUBJECT BURKE</span> &nbsp;&nbsp;
+            <span style="color:var(--red);">● PODCAST GUESTS (RECRUITED?)</span> &nbsp;&nbsp;
+            <span style="color:var(--text-dim);">● DTC/B2B CLIENTS</span> &nbsp;&nbsp;
+            <span style="color:var(--green);">● REFERRAL CHAIN (EXPANDING)</span>
+          </div>
+          <div style="text-align:center;margin-top:1.5rem;font-size:0.75rem;color:var(--text-dim);font-style:italic;">
+            "Subject's network grows at approximately 12 new connections per week. At this rate, full market saturation estimated in <span class="redacted">18 months</span>."
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 6: CONTAINMENT ATTEMPTS -->
+    <section>
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Section 6</div>
+          <h2 class="display section-title">Failed Containment Attempts</h2>
+          <p class="section-desc">The Bureau has made numerous attempts to slow, stop, or redirect Subject Burke. All have failed. Some spectacularly.</p>
+        </div>
+        <div class="containment-log reveal">
+          <div class="log-entry">
+            <div class="log-date">2021-03-14<br><span style="font-size:0.6rem;color:var(--text-dim);">OP: SLOW BURN</span></div>
+            <div class="log-action">Deployed <strong style="color:var(--amber);">market downturn</strong> to subject's primary industry. Expected: retreat to stable employment.</div>
+            <div class="log-result log-failed">FAILED — Subject pivoted to media buying within 72 hours</div>
+          </div>
+          <div class="log-entry">
+            <div class="log-date">2022-07-22<br><span style="font-size:0.6rem;color:var(--text-dim);">OP: INNER VOICE</span></div>
+            <div class="log-action">Deployed <strong style="color:var(--amber);">imposter syndrome</strong> via targeted psychological operation. Duration: 6 weeks.</div>
+            <div class="log-result log-failed">FAILED — Subject appeared immune. Closed 3 deals during operation window.</div>
+          </div>
+          <div class="log-entry">
+            <div class="log-date">2023-01-08<br><span style="font-size:0.6rem;color:var(--text-dim);">OP: COMFORT ZONE</span></div>
+            <div class="log-action">Anonymous tip suggesting a <strong style="color:var(--amber);">cushy 9-to-5 corporate job</strong> with full benefits and zero risk.</div>
+            <div class="log-result log-failed">FAILED — Subject laughed. Literally. Audio captured.</div>
+          </div>
+          <div class="log-entry">
+            <div class="log-date">2023-06-30<br><span style="font-size:0.6rem;color:var(--text-dim);">OP: DISTRACTION</span></div>
+            <div class="log-action">Flooded subject's feed with <strong style="color:var(--amber);">viral memes and Netflix recommendations</strong> to reduce productivity.</div>
+            <div class="log-result log-backfire">BACKFIRED — Subject created a workflow automation to filter distractions. Productivity increased 40%.</div>
+          </div>
+          <div class="log-entry">
+            <div class="log-date">2024-02-15<br><span style="font-size:0.6rem;color:var(--text-dim);">OP: COMPETITION</span></div>
+            <div class="log-action">Introduced <strong style="color:var(--amber);">three competing agencies</strong> into subject's territory simultaneously.</div>
+            <div class="log-result log-backfire">BACKFIRED — Competitors' clients defected to subject within 2 months. Referred by the competitors themselves.</div>
+          </div>
+          <div class="log-entry">
+            <div class="log-date">2024-08-01<br><span style="font-size:0.6rem;color:var(--text-dim);">OP: REALITY CHECK</span></div>
+            <div class="log-action">Deployed <strong style="color:var(--amber);">financial pressure</strong>. Subject barely breaking even. Expected: surrender.</div>
+            <div class="log-result log-failed">FAILED — Subject described situation as "loving the freedom." Morale unchanged. We give up.</div>
+          </div>
+          <div class="log-entry">
+            <div class="log-date">2024-11-20<br><span style="font-size:0.6rem;color:var(--text-dim);">OP: LAST RESORT</span></div>
+            <div class="log-action">Sent subject a <strong style="color:var(--amber);">strongly worded letter</strong> asking him to please stop being so effective. Said "please" twice.</div>
+            <div class="log-result log-failed">FAILED — Subject framed the letter. It's on his wall now.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 7: RISK CALCULATOR -->
+    <section>
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Section 7 — Interactive</div>
+          <h2 class="display section-title">Industry Risk Calculator</h2>
+          <p class="section-desc">Enter your business to assess the threat level if Subject Burke targets your industry.</p>
+        </div>
+        <div class="calc-box reveal">
+          <div class="calc-input-group">
+            <div class="calc-input-label">Business / Industry Name</div>
+            <input type="text" class="calc-input" id="bizInput" placeholder="e.g. Acme Widget Co.">
+          </div>
+          <button class="calc-btn" id="calcBtn">▶ RUN THREAT ANALYSIS</button>
+          <div class="calc-result" id="calcResult">
+            <div class="calc-result-header" id="calcHeader">⚠ ANALYSIS COMPLETE ⚠</div>
+            <div class="calc-result-body" id="calcBody"></div>
+            <div class="calc-threat-level">
+              <div class="calc-threat-text">EXTREME RISK</div>
+              <div class="calc-threat-sub">IMMEDIATE COLLABORATION RECOMMENDED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- SECTION 8: FINAL ASSESSMENT -->
+    <section class="final-section">
+      <div class="container reveal">
+        <div class="section-label" style="margin-bottom:2rem;">Section 8 — Final Assessment</div>
+        <div class="final-verdict">
+          "After extensive surveillance, multiple failed containment operations, and one very expensive investigation, the Bureau's conclusion is unanimous:"
+        </div>
+        <div class="final-stamp">SUBJECT CANNOT BE CONTAINED</div>
+        <p style="font-size:0.9rem;color:var(--text-dim);max-width:550px;margin:0 auto 3rem;line-height:1.8;">
+          Recommendation: <strong style="color:var(--amber)">Immediate collaboration.</strong><br>
+          If you can't beat him, hire him. If you can't hire him, refer someone who will.<br>
+          He'll earn it anyway.
+        </p>
+        <a href="https://www.instagram.com/deej.burke/" target="_blank" class="final-cta">COLLABORATE WITH SUBJECT BURKE →</a>
+        <div class="final-links">
+          <a href="https://www.instagram.com/deej.burke/" target="_blank" class="final-link">Instagram: @deej.burke</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="footer-agency">Bureau of Commercial Intelligence</div>
+        <div class="footer-tagline">South Africa Field Office • File #DBK-2024-0847 • Classification: BEYOND TOP SECRET</div>
+        <div class="footer-disclaimer">This document is a work of satirical fiction created with admiration and respect. Dylan "Deej" Burke is a real person who is genuinely this impressive. No actual government agencies were involved in this investigation, though they probably should be.</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Console easter egg
+    console.log('%c⚠ CLASSIFIED ⚠', 'color:#c0392b;font-size:2rem;font-weight:bold;');
+    console.log('%cNice try, Agent. This file is above your clearance level.', 'color:#d4a853;font-size:1rem;');
+    console.log('%cSubject Burke has been notified of your snooping.', 'color:#7a7265;font-size:0.8rem;');
+
+    const $=id=>document.getElementById(id);
+
+    // SPLASH & ENTRY
+    let stampClicks=0, entered=false, startTime=null;
+    const splash=$('splash'), mainContent=$('mainContent'), survBar=$('survBar');
+
+    $('classifiedStamp').addEventListener('click',()=>{
+      stampClicks++;
+      if(stampClicks>=5){
+        $('breachOverlay').classList.add('active');
+        stampClicks=0;
+      }
+    });
+
+    $('enterBtn').addEventListener('click',()=>{
+      entered=true;
+      startTime=Date.now();
+      splash.classList.add('hidden');
+      mainContent.classList.add('active');
+      survBar.classList.add('visible');
+      initGauges();
+      initNetwork();
+      // Start surveillance timer
+      setInterval(updateTimer,1000);
+    });
+
+    function updateTimer(){
+      if(!startTime)return;
+      const elapsed=Math.floor((Date.now()-startTime)/1000);
+      const h=String(Math.floor(elapsed/3600)).padStart(2,'0');
+      const m=String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+      const s=String(elapsed%60).padStart(2,'0');
+      $('survTimer').textContent=`${h}:${m}:${s}`;
+    }
+
+    // SCROLL REVEAL
+    const revealObserver=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target);}});
+    },{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
+    document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+
+    // REDACTED TEXT
+    document.querySelectorAll('.redacted').forEach(el=>{
+      el.addEventListener('click',()=>el.classList.toggle('revealed'));
+    });
+
+    // GAUGE ANIMATION
+    function initGauges(){
+      const gaugeObserver=new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            e.target.querySelectorAll('.gauge-bar-inner').forEach(bar=>{
+              bar.style.width=bar.dataset.width+'%';
+            });
+            gaugeObserver.unobserve(e.target);
+          }
+        });
+      },{threshold:0.3});
+      gaugeObserver.observe($('gaugesGrid'));
+    }
+
+    // NETWORK DIAGRAM
+    function initNetwork(){
+      const canvas=$('networkCanvas');
+      const ctx=canvas.getContext('2d');
+      const dpr=window.devicePixelRatio||1;
+      function resize(){
+        const rect=canvas.getBoundingClientRect();
+        canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+        ctx.scale(dpr,dpr);
+      }
+      resize();
+      window.addEventListener('resize',resize);
+
+      const W=()=>canvas.getBoundingClientRect().width;
+      const H=()=>canvas.getBoundingClientRect().height;
+
+      // Nodes
+      const nodes=[];
+      const center={x:0.5,y:0.5,r:12,color:'#d4a853',label:'DEEJ',type:'center'};
+      nodes.push(center);
+
+      const podcastGuests=['Founder A','Founder B','Founder C','Founder D','Founder E','CEO X','CTO Y'];
+      const clients=['DTC Brand 1','B2B Client 2','SaaS Co.','E-comm Co.','Agency Z'];
+      const referrals=['Referral 1','Referral 2','Referral 3','Referral 4'];
+
+      podcastGuests.forEach((n,i)=>{
+        const a=(i/podcastGuests.length)*Math.PI*2-Math.PI/2;
+        nodes.push({x:0.5+Math.cos(a)*0.25,y:0.5+Math.sin(a)*0.25,r:5,color:'#c0392b',label:n,type:'podcast',parent:0});
+      });
+
+      clients.forEach((n,i)=>{
+        const a=(i/clients.length)*Math.PI*2;
+        nodes.push({x:0.5+Math.cos(a)*0.38,y:0.5+Math.sin(a)*0.38,r:4,color:'#7a7265',label:n,type:'client',parent:0});
+      });
+
+      referrals.forEach((n,i)=>{
+        const a=(i/referrals.length)*Math.PI*2+0.5;
+        nodes.push({x:0.5+Math.cos(a)*0.45,y:0.5+Math.sin(a)*0.45,r:3,color:'#27ae60',label:n,type:'referral',parent:Math.floor(Math.random()*5)+podcastGuests.length+1});
+      });
+
+      let frame=0;
+      function draw(){
+        const w=W(),h=H();
+        ctx.clearRect(0,0,w,h);
+        frame++;
+
+        // Draw connections
+        nodes.forEach((n,i)=>{
+          if(n.parent!==undefined){
+            const p=nodes[n.parent];
+            ctx.beginPath();
+            ctx.moveTo(p.x*w,p.y*h);
+            ctx.lineTo(n.x*w,n.y*h);
+            ctx.strokeStyle=n.color+'40';
+            ctx.lineWidth=1;
+            ctx.stroke();
+
+            // Animated pulse along line
+            const t=(frame%120)/120;
+            const px=p.x*w+(n.x*w-p.x*w)*t;
+            const py=p.y*h+(n.y*h-p.y*h)*t;
+            ctx.beginPath();ctx.arc(px,py,2,0,Math.PI*2);
+            ctx.fillStyle=n.color+'80';ctx.fill();
+          }
+        });
+
+        // Draw nodes
+        nodes.forEach(n=>{
+          const nx=n.x*w+Math.sin(frame*0.02+n.x*10)*2;
+          const ny=n.y*h+Math.cos(frame*0.02+n.y*10)*2;
+
+          // Glow
+          if(n.type==='center'){
+            ctx.beginPath();ctx.arc(nx,ny,30,0,Math.PI*2);
+            const g=ctx.createRadialGradient(nx,ny,0,nx,ny,30);
+            g.addColorStop(0,n.color+'30');g.addColorStop(1,'transparent');
+            ctx.fillStyle=g;ctx.fill();
+          }
+
+          ctx.beginPath();ctx.arc(nx,ny,n.r,0,Math.PI*2);
+          ctx.fillStyle=n.color;ctx.fill();
+
+          if(n.label&&n.type==='center'){
+            ctx.fillStyle='#0a0a0a';ctx.font='bold 8px IBM Plex Mono';
+            ctx.textAlign='center';ctx.textBaseline='middle';
+            ctx.fillText(n.label,nx,ny);
+          }
+        });
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    // RISK CALCULATOR
+    const riskOutputs=[
+      (biz)=>`<strong>${biz}</strong> has been flagged for immediate vulnerability assessment.\n\nOur models indicate that if Subject Burke enters your market:\n• <strong>87% of your leads</strong> will receive a more honest pitch than you've ever given them\n• <strong>Your top clients</strong> will start asking "why can't YOU be more like that Burke guy?"\n• <strong>Revenue impact:</strong> You'll either lose everything or gain everything by hiring him\n• <strong>Timeline to disruption:</strong> 6-8 weeks (he starts lean, remember)`,
+      (biz)=>`ALERT: <strong>${biz}</strong> is critically exposed.\n\nField analysis suggests:\n• Subject will start with suspiciously reasonable rates — this is the trap\n• By month 2, results will speak for themselves — you'll want to pay him more\n• By month 4, he'll have automated half your workflow with no-code tools you didn't know existed\n• By month 6, your entire referral pipeline will somehow lead back to his podcast\n• <strong>Survival probability without collaboration: 23%</strong>`,
+      (biz)=>`CLASSIFIED PROJECTION FOR <strong>${biz}</strong>:\n\nScenario modeling complete. All outcomes converge on one result:\n• Subject Burke will approach your industry with brutal honesty\n• He will NOT oversell. He will NOT overpromise. This is somehow MORE dangerous.\n• Clients who experience his approach develop "Burke Dependency" — a condition where normal sales pitches feel hollow\n• <strong>Your competitors who hired him first:</strong> already thriving\n• <strong>Recommended action:</strong> call him before he calls your competitor`,
+    ];
+
+    $('calcBtn').addEventListener('click',()=>{
+      const biz=$('bizInput').value.trim()||'Your Business';
+      const result=$('calcResult');
+      const body=$('calcBody');
+      const output=riskOutputs[Math.floor(Math.random()*riskOutputs.length)](biz);
+      body.innerHTML=output.replace(/\n/g,'<br>');
+      result.classList.add('visible');
+    });
+  </script>
+</body>
+</html>
